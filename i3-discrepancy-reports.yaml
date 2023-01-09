@@ -1,0 +1,680 @@
+openapi: 3.0.1
+info:
+  title: Discrepancy Reports Service
+  version: "1.0"
+servers:
+  - url: http://localhost/DiscrepancyReports/v1
+paths:
+  /Reports:
+    post:
+      tags:
+        - SubmitReport
+      summary: Submits a new Discrepancy Report
+      operationId: SubmitReport
+      requestBody:
+        description: Discrepancy Report data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscrepancyReport'
+        required: true
+      callbacks:
+        submitResolution:
+          '{#/components/schemas/DiscrepancyReport/resolutionUri}':
+            post:
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/DiscrepancyResolution'
+              responses:
+                '201':
+                  description: Resolution received
+      responses:
+        '201':
+          description: Report successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscrepancyReportResponse'
+        '454':
+          description: Unspecified Error
+        '470':
+          description: Unknown Service/Database (“not ours”)
+        '471':
+          description: Unauthorized Reporter
+  /Resolutions:
+    post:
+      tags:
+        - SubmitResolution
+      summary: Submits a new Discrepancy Resolution
+      operationId: SubmitResolutiuon
+      requestBody:
+        description: Discrepancy Resolution data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscrepancyResolution'
+        required: true
+      responses:
+        '201':
+          description: Discrepancy Resolution successfully created
+        '454':
+          description: Unspecified Error
+        '472':
+          description: Unauthorized Responder
+        '473':
+          description: Unknown ReportId
+    get:
+      tags:
+        - GetResolution
+      summary: Retrieves a Discrepancy Report Resolution based on Agency Name and Discrepancy Report ID
+      operationId: GetResolution
+      parameters:
+        - name: agencyName
+          in: query
+          description: Reporting Agency Name
+          required: true
+          schema:
+            type: string
+        - name: discrepancyReportId
+          in: query
+          description: ID of the Discrepancy Report
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resolution found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscrepancyResolution'
+        '404':
+          description: Not found
+        '471':
+          description: Unauthorized Reporter
+        '473':
+          description: Unknown ReportId
+        '475':
+          description: Response not available yet
+  /StatusUpdates:
+    get:
+      tags:
+        - StatusUpdateRequest
+      summary: Request a Status Update for a previously submitted Discrepancy Report
+      operationId: StatusUpdateRequest
+      parameters:
+        - name: agencyName
+          in: query
+          description: Reporting Agency Name
+          required: true
+          schema:
+            type: string
+        - name: discrepancyReportId
+          in: query
+          description: ID of the Discrepancy Report
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status Update found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusUpdate'
+        '404':
+          description: Not found
+        '454':
+          description: Unspecified Error
+        '471':
+          description: Unauthorized Reporter
+        '473':
+          description: Unknown ReportId
+        '474':
+          description: Resolution already provided
+  /Versions:
+    servers:
+      - url: https://api.example.com/DiscrepancyReports
+        description: Override base path for Versions query
+    get:
+      tags:
+        - RetrieveVersions
+      summary: Retrieves all supported versions, vendor parameter is optional.
+      operationId: RetrieveVersions
+      responses:
+        '200':
+          description: Versions found
+          content:
+            application/json:
+              schema:
+                $ref: 'i3-common.yaml#/components/schemas/VersionsArray'
+components:
+  schemas:
+    DiscrepancyReport:
+      type: object
+      required:
+        - resolutionUri
+        - reportType
+        - discrepancyReportSubmitTimeStamp
+        - discrepancyReportId
+        - reportingAgencyName
+        - reportingContactJcard
+        - problemSeverity
+      properties:
+        resolutionUri:
+          type: string
+          format: uri
+          example: https://agencyX.com/DiscrepancyReports/resolutions
+        reportType:
+          type: string
+          enum: [PolicyStoreDiscrepancyReport, LostDiscrepancyReport, BcfDiscrepancyReport, LoggingDiscrepancyReport, CallTakerDiscrepancyReport,
+                 SipDiscrepancyReport, PermissionsDiscrepancyReport, GisDiscrepancyReport, LisDiscrepancyReport, PolicyDiscrepancyReport,
+                 OriginatingServiceDiscrepancyReport, CallTransferDiscrepancyReport, McsDiscrepancyReport, EsrpDiscrepancyReport, AdrDiscrepancyReport,
+                 NetworkDiscrepancyReport, ImrDiscrepancyReport, TestCallDiscrepancyReport, LogSignatureCertificateDiscrepancyReport]
+        discrepancyReportSubmitTimeStamp:
+          type: string
+          format: date-time
+          example: '2020-03-10T10:00:00-05:00'
+        discrepancyReportId:
+          type: string
+        reportingAgencyName:
+          type: string
+        reportingAgentId:
+          type: string
+        reportingContactJcard:
+          type: string
+        problemService:
+          type: string
+        problemSeverity:
+          type: string
+        problemComments:
+          type: string
+      discriminator:
+        propertyName: reportType
+    DiscrepancyReportResponse:
+      type: object
+      required:
+        - respondingAgencyName
+        - respondingContactJcard
+      properties:
+        respondingAgencyName:
+          type: string
+        respondingContactJcard:
+          type: string
+        respondingAgentId:
+          type: string
+        responseEstimatedReturnTime:
+          type: string
+          format: date-time
+          example: '2020-03-10T10:00:00-05:00'
+        responseComments:
+          type: string
+    DiscrepancyResolution:
+      type: object
+      required:
+        - respondingAgencyName
+        - respondingContactJcard
+        - discrepancyReportId
+        - reportingAgencyName
+        - problemService
+        - responseTime
+        - resolution
+      properties:
+        respondingAgencyName:
+          type: string
+        respondingContactJcard:
+          type: string
+        respondingAgentId:
+          type: string
+        discrepancyReportId:
+          type: string
+        reportingAgencyName:
+          type: string
+        problemService:
+          type: string
+        responseTime:
+          type: string
+          format: date-time
+          example: '2020-03-10T10:00:00-05:00'
+        reportingAgentId:
+          type: string
+        responseComments:
+          type: string
+        resolution:
+          type: string
+          enum: [DiscrepancyCorrected, NoDiscrepancy, OtherResponse, PolicyAdded, PolicyUpdated, NoSuchPolicy, InsufficientCredentials, EntryAdded,
+                 PerPolicy, CallTakerAdvised, TransferCorrect, BadCertificateChain, DataCorrected, RecordsCorrected, PermissionsCorrected,
+                 DeviceConfigError, PolicyCorrected, NoError, ProblemCorrected, InvalidRecord, Gis, Acknowledged, OtherResponse]
+    StatusUpdate:
+      type: object
+      required:
+        - respondingAgencyName
+        - respondingContactJcard
+        - responseEstimatedReturnTime
+      properties:
+        respondingAgencyName:
+          type: string
+        respondingContactJcard:
+          type: string
+        respondingAgentId:
+          type: string
+        responseEstimatedReturnTime:
+          type: string
+          format: date-time
+          example: '2020-03-10T10:00:00-05:00'
+        statusComments:
+          type: string
+    PolicyStoreDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - policyAgencyName
+            - problem
+            - retrievePolicyResponse
+          properties:
+            policyType:
+              type: string
+            policyQueueName:
+              type: string
+            policyId:
+              type: string
+            policyAgencyName:
+              type: string
+            problem:
+              type: string
+              enum: [PolicyInvalid, PolicyAltered, SignatureVerificationFailure, PolicyMissing, OtherPolicyStore]
+            retrievePolicyResponse:
+              type: string
+    LostDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - query
+            - request
+            - response
+            - problem
+          properties:
+            query:
+              type: string
+              enum: [findService, getServiceBoundary, listServices, listServicesByLocation]
+            request:
+              type: string
+            response:
+              type: string
+            problem:
+              type: string
+              enum: [BelievedValid, BelievedInvalid, NoSuchLocation, RouteIncorrect, MultipleMappings, ServiceBoundaryIncorrect, ServiceNumberIncorrect, DataExpired, IncorrectUri, LocationErrorInError, OtherLost]
+            discrepancyDetail:
+              type: string
+    BcfDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - problem
+            - sosSource
+            - eventTimestamp
+          properties:
+            request:
+              type: string
+            problem:
+              type: string
+              enum: [InitialTrafficBlocked, MidTrafficBlocked, BadSdp, BadSip, MediaLoss, TrafficNotBlockedBadActor, TrafficNotBlocked, Qos, BadCdr, Tty, Firewall, OtherBcf]
+            sosSource:
+              type: string
+              format: byte
+            eventTimestamp:
+              type: string
+              format: date-time
+              example: '2020-03-10T10:00:00-05:00'
+            packetHeader:
+              type: string
+    LoggingDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - request
+            - problem
+            - result
+          properties:
+            request:
+              type: string
+            problem:
+              type: string
+              enum: [InviteSrsError, LogEventError, RetrieveLogEventError, OtherLogging]
+            result:
+              type: string
+            callIdUrn:
+              type: string
+            incidentIdUrn:
+              type: string
+    CallTakerDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - callIdUrn
+            - incidentIdUrn
+            - pidfLo
+            - callHeader
+          properties:
+            callIdUrn:
+              type: string
+            incidentIdUrn:
+              type: string
+            pidfLo:
+              type: string
+            callHeader:
+              type: string
+    SipDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - problem
+          properties:
+            problem:
+              type: string
+              enum: [InitialINVITE, MESSAGE, OPTIONS, MidDialog, RequiredMedia, MediaProblem, EngorgedQ, Signaling, OtherSip]
+            callIdUrn:
+              type: string
+            incidentIdUrn:
+              type: string
+            testCallGenerator:
+              type: string
+            request:
+              type: string
+            result:
+              type: string
+            queueName:
+              type: string
+    PermissionsDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - problem
+            - resource
+            - identity
+            - result
+          properties:
+            problem:
+              type: string
+              enum: [UnableAuthenticate, UnableSubscribe, AbleSubscribe, UnableRead, UnableWrite, UnableDelete, AbleRead, AbleWrite, AbleDelete, OtherPermissions]
+            resource:
+              type: string
+            identity:
+              type: string
+            result:
+              type: string
+            detail:
+              type: string
+    GisDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - problem
+          properties:
+            problem:
+              type: string
+              enum: [Gap, Overlap, IncorrectLost, BadGeometry, DuplicateAttribute, OmittedField, IncorrectDataType, AddressRange, GeneralProvisioning, MalformedUri, DisplayData, OtherGis]
+            layerIds:
+              type: string
+            location:
+              type: string
+            lostUri:
+              type: string
+              format: uri
+            detail:
+              type: string
+    LisDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - problem
+          properties:
+            problem:
+              type: string
+              enum: [IncorrectRecords, OwnLocationUnavailable, LocationReferenceNotResolved, BadPidfLo, IncorrectLocation, OtherLis]
+            ownLocationRequest:
+              type: string
+            locationUrn:
+              type: string
+            pidfLo:
+              type: string
+    PolicyDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - policyId
+          properties:
+            policyId:
+              type: string
+            problem:
+              type: string
+              enum: [InvalidUrn, UnknownPSAP, ConflictingRoute, OtherConflict, IncorrectUrn, Malformed, Loop, VerificationFailure, OtherPolicy]
+            location:
+              type: string
+            callId:
+              type: string
+            routeUrn:
+              type: string
+    OriginatingServiceDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - problem
+          properties:
+            problem:
+              type: string
+              enum: [LocationNotLvfValid, LocationNotUsable, NoAni, BadPidfLo, QueryTimeOut, CallDropped, IncorrectLocation, BadSip, CallDrought, CallFlood, InvalidAdr, BadAdditionalData, OtherOsp, StiError]
+            status:
+              type: string
+            location:
+              type: string
+            locationId:
+              type: string
+            locationCorrect:
+              type: string
+            callHeader:
+              type: string
+            callVolume:
+              type: integer
+              format: int32
+            callVolumeTimePeriod:
+              type: integer
+              format: int32
+    CallTransferDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - callId
+            - incidentId
+            - origin
+            - status
+            - destination
+          properties:
+            callId:
+              type: string
+            incidentId:
+              type: string
+            origin:
+              type: string
+            status:
+              type: string
+            destination:
+              type: string
+    McsDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - serviceCall
+            - pidfLo
+            - msag
+            - statusCode
+          properties:
+            serviceCall:
+              type: string
+            pidfLo:
+              type: string
+            msag:
+              type: string
+            statusCode:
+              type: string
+            referral:
+              type: string
+    EsrpDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - problem
+          properties:
+            problem:
+              type: string
+              enum: [CallReceived, EngorgedQ, CallDrought]
+            callId:
+              type: string
+            incidentId:
+              type: string
+            pidfLo:
+              type: string
+            queueName:
+              type: string
+    AdrDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - problem
+          properties:
+            problem:
+              type: string
+              enum: [ReferenceNotResolved, Malformed, UnknownBlock, ReceivedIncorrectData, TooManyUris, OtherAdr]
+            block:
+              type: string
+            location:
+              type: string
+            identity:
+              type: string
+            url:
+              type: string
+              format: uri
+            result:
+              type: string
+    NetworkDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - problem
+            - timestamp
+          properties:
+            problem:
+              type: string
+              enum: [ReferenceNotResolved, Malformed, UnknownBlock, ReceivedIncorrectData, TooManyUris, OtherAdr]
+            ipAddressLocal:
+              type: string
+              format: ipv4
+            ipAddressRemote:
+              type: string
+              format: ipv4
+            url:
+              type: string
+              format: uri
+            timestamp:
+              type: string
+              format: date-time
+              example: '2020-03-10T10:00:00-05:00'
+    ImrDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - problem
+            - callId
+            - callHeader
+          properties:
+            problem:
+              type: string
+              enum: [EngorgedQ, ResponseIncorrect, ResponseConfusing, CallTransferIncorrect, ExcessiveSilence, UnknownScript, InputFailed, ScriptLogicFailure, OtherImr]
+            callId:
+              type: string
+            incidentId:
+              type: string
+            callHeader:
+              type: string
+    TestCallDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - problem
+            - callIdUrn
+            - request
+            - nbrOfCalls
+            - successCount
+            - failCount
+            - time
+            - result
+            - mediaOk
+          properties:
+            problem:
+              type: string
+              enum: [TestInvite, TestMessage, TestOptions, TestMidDialog, TestMedia, TestLoopbackMedia, TestSignaling, OtherTestCall]
+            callIdUrn:
+              type: string
+              format: uri
+            request:
+              type: string
+            nbrOfCalls:
+              type: integer
+              format: int32
+            successCount:
+              type: integer
+              format: int32
+            failCount:
+              type: integer
+              format: int32
+            time:
+              type: string
+              format: date-time
+              example: '2020-03-10T10:00:00-05:00'
+            result:
+              type: integer
+              format: int32
+            contact:
+              type: string
+            sdp:
+              type: string
+            mediaOk:
+              type: boolean
+    LogSignatureCertificateDiscrepancyReport:
+      allOf:
+        - $ref: '#/components/schemas/DiscrepancyReport'
+        - type: object
+          required:
+            - problem
+            - logIdentifier
+          properties:
+            problem:
+              type: string
+              enum: [BadAlgorithm, NoCert, BadURL, BadThumb, BadCertX5c, BadCertX5u, BadSignature, OtherLogSignature]
+            logIdentifier:
+              type: string
+            result:
+              type: string
+            thumbCalc:
+              type: string
