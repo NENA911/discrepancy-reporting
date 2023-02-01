@@ -1,4 +1,4 @@
-# Geocode-Conversion-Service
+# Discrepancy-Reporting-Service
 
 The Discrepancy Reporting web service is used by a reporting entity to initiate a Discrepancy Report. 
 
