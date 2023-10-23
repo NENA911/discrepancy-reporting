@@ -59,7 +59,7 @@ paths:
         required: true
       responses:
         '201':
-          description: Discrepancy Resolution successfully created
+          description: Discrepancy Resolution Successfully Created
         '454':
           description: Unspecified Error
         '472':
@@ -86,19 +86,19 @@ paths:
             type: string
       responses:
         '200':
-          description: Resolution found
+          description: Resolution Found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscrepancyResolution'
         '404':
-          description: Not found
+          description: Not Found
         '471':
           description: Unauthorized Reporter
         '473':
           description: Unknown ReportId
         '475':
-          description: Response not available yet
+          description: Response Not Available Yet
   /StatusUpdates:
     get:
       tags:
@@ -120,13 +120,13 @@ paths:
             type: string
       responses:
         '200':
-          description: Status Update found
+          description: Status Update Found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusUpdate'
         '404':
-          description: Not found
+          description: Not Found
         '454':
           description: Unspecified Error
         '471':
@@ -134,7 +134,7 @@ paths:
         '473':
           description: Unknown ReportId
         '474':
-          description: Resolution already provided
+          description: Resolution Already Provided
   /Versions:
     servers:
       - url: https://api.example.com/DiscrepancyReports
@@ -146,7 +146,7 @@ paths:
       operationId: RetrieveVersions
       responses:
         '200':
-          description: Versions found
+          description: Versions Found
           content:
             application/json:
               schema:
