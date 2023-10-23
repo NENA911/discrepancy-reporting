@@ -30,10 +30,10 @@ paths:
                       $ref: '#/components/schemas/DiscrepancyResolution'
               responses:
                 '201':
-                  description: Resolution received
+                  description: Resolution Received
       responses:
         '201':
-          description: Report successfully created
+          description: Report Successfully Created
           content:
             application/json:
               schema:
@@ -41,7 +41,7 @@ paths:
         '454':
           description: Unspecified Error
         '470':
-          description: Unknown Service/Database (“not ours”)
+          description: Unknown Service/Database (“Not Ours”)
         '471':
           description: Unauthorized Reporter
   /Resolutions:
