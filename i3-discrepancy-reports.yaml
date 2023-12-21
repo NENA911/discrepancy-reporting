@@ -245,7 +245,7 @@ components:
           type: string
         resolution:
           type: string
-          enum: [DiscrepancyCorrected, NoDiscrepancy, OtherResponse, PolicyAdded, PolicyUpdated, NoSuchPolicy, InsufficientCredentials, EntryAdded,
+          enum: [DiscrepancyCorrected, NoDiscrepancy, PolicyAdded, PolicyUpdated, NoSuchPolicy, InsufficientCredentials, EntryAdded,
                  PerPolicy, CallTakerAdvised, TransferCorrect, BadCertificateChain, DataCorrected, RecordsCorrected, PermissionsCorrected,
                  DeviceConfigError, PolicyCorrected, NoError, ProblemCorrected, InvalidRecord, Gis, Acknowledged, OtherResponse]
     StatusUpdate:
