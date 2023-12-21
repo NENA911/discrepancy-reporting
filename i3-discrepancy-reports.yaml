@@ -154,6 +154,29 @@ paths:
 components:
   schemas:
     DiscrepancyReport:
+      oneOf:
+        - $ref: '#/components/schemas/PolicyStoreDiscrepancyReport'
+        - $ref: '#/components/schemas/LostDiscrepancyReport'
+        - $ref: '#/components/schemas/BcfDiscrepancyReport'
+        - $ref: '#/components/schemas/LoggingDiscrepancyReport'
+        - $ref: '#/components/schemas/CallTakerDiscrepancyReport'
+        - $ref: '#/components/schemas/SipDiscrepancyReport'
+        - $ref: '#/components/schemas/PermissionsDiscrepancyReport'
+        - $ref: '#/components/schemas/GisDiscrepancyReport'
+        - $ref: '#/components/schemas/LisDiscrepancyReport'
+        - $ref: '#/components/schemas/PolicyDiscrepancyReport'
+        - $ref: '#/components/schemas/OriginatingServiceDiscrepancyReport'
+        - $ref: '#/components/schemas/CallTransferDiscrepancyReport'
+        - $ref: '#/components/schemas/McsDiscrepancyReport'
+        - $ref: '#/components/schemas/EsrpDiscrepancyReport'
+        - $ref: '#/components/schemas/AdrDiscrepancyReport'
+        - $ref: '#/components/schemas/NetworkDiscrepancyReport'
+        - $ref: '#/components/schemas/ImrDiscrepancyReport'
+        - $ref: '#/components/schemas/TestCallDiscrepancyReport'
+        - $ref: '#/components/schemas/LogSignatureCertificateDiscrepancyReport'
+      discriminator:
+        propertyName: reportType
+    DiscrepancyReportCommon:
       type: object
       required:
         - resolutionUri
@@ -192,8 +215,6 @@ components:
           type: string
         problemComments:
           type: string
-      discriminator:
-        propertyName: reportType
     DiscrepancyReportResponse:
       type: object
       required:
@@ -269,7 +290,7 @@ components:
           type: string
     PolicyStoreDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - policyAgencyName
@@ -291,7 +312,7 @@ components:
               type: string
     LostDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - query
@@ -313,7 +334,7 @@ components:
               type: string
     BcfDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - problem
@@ -336,7 +357,7 @@ components:
               type: string
     LoggingDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - request
@@ -356,7 +377,7 @@ components:
               type: string
     CallTakerDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - callIdUrn
@@ -374,7 +395,7 @@ components:
               type: string
     SipDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - problem
@@ -396,7 +417,7 @@ components:
               type: string
     PermissionsDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - problem
@@ -417,7 +438,7 @@ components:
               type: string
     GisDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - problem
@@ -436,7 +457,7 @@ components:
               type: string
     LisDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - problem
@@ -452,7 +473,7 @@ components:
               type: string
     PolicyDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - policyId
@@ -470,7 +491,7 @@ components:
               type: string
     OriginatingServiceDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - problem
@@ -496,7 +517,7 @@ components:
               format: int32
     CallTransferDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - callId
@@ -517,7 +538,7 @@ components:
               type: string
     McsDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - serviceCall
@@ -537,7 +558,7 @@ components:
               type: string
     EsrpDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - problem
@@ -555,7 +576,7 @@ components:
               type: string
     AdrDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - problem
@@ -576,7 +597,7 @@ components:
               type: string
     NetworkDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - problem
@@ -600,7 +621,7 @@ components:
               example: '2020-03-10T10:00:00-05:00'
     ImrDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - problem
@@ -618,7 +639,7 @@ components:
               type: string
     TestCallDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - problem
@@ -663,7 +684,7 @@ components:
               type: boolean
     LogSignatureCertificateDiscrepancyReport:
       allOf:
-        - $ref: '#/components/schemas/DiscrepancyReport'
+        - $ref: '#/components/schemas/DiscrepancyReportCommon'
         - type: object
           required:
             - problem
